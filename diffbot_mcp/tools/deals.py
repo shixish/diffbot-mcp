@@ -7,13 +7,10 @@ from ..dql import DEFAULT_FIELDS, clean_value, resolve_value, run
 from ..dql_builder import build, clause, compare, date_range, sort_clause, subquery, parse_range
 
 DESCRIPTION = (
-    "Searches funding rounds, investments, and acquisitions by company, investor, acquirer, series, amount, "
-    "date, or the company's industry. Use for deal flow, a company's funding history, an investor's activity, "
-    "and M&A lists. Company firmographics such as revenue, headcount, and headquarters are "
-    "search_organizations. kind defaults to funding; acquisitions lists acquired companies; any covers funding "
-    "and other transactions. sort defaults to newest even when omitted; pass largest for the biggest deals. "
-    "amount is a range such as '50M+' or '1M-10M' in currency (default USD). Dates are YYYY-MM-DD. investor "
-    "and series do not apply to acquisitions. Needs a Diffbot token only when called."
+    "Funding rounds, investments, and acquisitions in the Diffbot Knowledge Graph by company, investor, acquirer, "
+    "round series, amount, date, or the company's industry. Prefer for deal flow, a company's funding history, an "
+    "investor's portfolio activity, M&A lists, and the largest deals in a period. For related company data use "
+    "search_organizations."
     " API docs: https://www.diffbot.com/docs/dql/"
 )
 
@@ -187,7 +184,7 @@ def render_company_rounds(entity: dict, **conditions) -> List[dict]:
 
 @mcp.tool(name="search_deals", title="Search Deals", description=DESCRIPTION, annotations=READ_ONLY)
 async def search_deals(
-    kind: Annotated[Kind, "funding (default): investment rounds. acquisitions: acquired companies. any: funding and other transactions. series applies to funding only"] = "funding",
+    kind: Annotated[Kind, "funding | acquisitions | any"] = "funding",
     company: Annotated[Optional[str], "Company raising or acquired"] = None,
     investor: Annotated[Optional[str], "Investor name"] = None,
     acquirer: Annotated[Optional[str], "Acquirer name"] = None,

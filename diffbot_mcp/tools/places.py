@@ -7,12 +7,9 @@ from ..dql import PLACE_FIELDS, run
 from ..dql_builder import build, clause, compare, name_variants, near_clause, or_clause, sort_clause, parse_range, split_near
 
 DESCRIPTION = (
-    "Searches Knowledge Graph cities, counties, states, countries, and points of interest by name, population, "
-    "containing place, or proximity. Use for facts about a place. Company headquarters and offices are "
-    "search_organizations, not this tool. kind defaults to any; poi is a point of interest and "
-    "administrative_area is any admin boundary. population is a range such as '1M+' or '10000-50000'; near is "
-    "'Paris 50km' or 'Austin 30mi'. continent is a loose match on the prose description, not a real field, and "
-    "over-includes. Broad kinds need a name or a containing place. Needs a Diffbot token only when called."
+    "Cities, counties, states, provinces, countries, and points of interest in the Diffbot Knowledge Graph by "
+    "name, population, containing place, or proximity. Prefer for facts on places, rather than recalling from "
+    "memory."
     " API docs: https://www.diffbot.com/docs/dql/"
 )
 
@@ -82,14 +79,14 @@ def build_places_query(
 
 @mcp.tool(name="search_places", title="Search Places", description=DESCRIPTION, annotations=READ_ONLY)
 async def search_places(
-    kind: Annotated[Kind, "Place type. poi is a point of interest; administrative_area is any admin boundary; any (default) searches every type"] = "any",
-    name: Annotated[Optional[str], "Place name, exact. The given spelling and a diacritic-stripped variant are both tried"] = None,
+    kind: Annotated[Kind, "country | region | subregion | city | administrative_area | poi | any"] = "any",
+    name: Annotated[Optional[str], "Place name, exact"] = None,
     descriptors: Annotated[Optional[str], "Free text, e.g. 'national park' (poi)"] = None,
     country: Annotated[Optional[str], "Containing country"] = None,
     region: Annotated[Optional[str], "Containing state/region"] = None,
     subregion: Annotated[Optional[str], "Containing county/district"] = None,
     within: Annotated[Optional[str], "Containing place, any level"] = None,
-    continent: Annotated[Optional[str], "Continent name. No continent field exists; this is a loose prose match and over-includes"] = None,
+    continent: Annotated[Optional[str], "Continent (text match, loose)"] = None,
     near: Annotated[Optional[str], "Place and radius, e.g. 'Paris 50km'"] = None,
     population: Annotated[Optional[str], "Range, e.g. '1M+', '10000-50000'"] = None,
     sort: Annotated[Optional[Sort], "Only if ordering is the question"] = None,

@@ -7,10 +7,9 @@ from ..app import READ_ONLY, mcp
 from ..dql import enum_values, find_named, get_ontology, ontology_fields, ontology_names, rank_names, taxonomy_values
 
 DESCRIPTION = (
-    "Looks up Knowledge Graph entity types, fields, and the exact spelling of taxonomy or enum values. Use "
-    "before dql, or when a typed search returns candidate values: a guessed field path is silently ignored and a "
-    "guessed value returns zero. Does not run a query or return entities. dql_probe counts hits; dql returns "
-    "rows. Results are ranked best match first. Needs a Diffbot token only when called."
+    "Looks up the Knowledge Graph ontology: entity types, their fields, and taxonomy or enum values. Use before "
+    "raw dql to confirm a field path exists and to get the exact spelling of a value (a guessed path is silently "
+    "ignored, a guessed value returns zero). Results are ranked best match first."
     " API docs: https://docs.diffbot.com/docs/ontology"
 )
 

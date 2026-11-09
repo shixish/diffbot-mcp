@@ -7,12 +7,11 @@ from ..dql import DEFAULT_FIELDS, resolve_value, run
 from ..dql_builder import build, clause, compare, looks_like_domain, near_clause, or_clause, sort_clause, validate_date, subquery, parse_date_range, parse_range, split_near
 
 DESCRIPTION = (
-    "Searches Knowledge Graph companies by name, industry, headquarters, headcount, revenue, founding date, "
-    "ownership, or similar_to lookalikes. Use for prospect lists, market maps, and firmographic facts instead "
-    "of search_web, and do not drop to dql for filters this tool accepts. People are search_people; funding "
-    "rounds and acquisitions are search_deals. Location filters are headquarters only; any office, or a shape "
-    "this tool lacks, is dql. Needs at least one filter. A domain passed as name matches the homepage. "
-    "Ambiguous industry text returns taxonomy candidates instead of rows. Needs a Diffbot token only when called."
+    "Company and organization structured search over the Diffbot Knowledge Graph. Prefer for prospect lists, "
+    "market maps, competitor sets, and firmographic facts on a market or named company(ies). Filter by industry, "
+    "location, headcount, revenue, founding date, public status, founder, investor, acquirer, parent company. "
+    "Prefer over a generic web search when answer involves structured company data. For investment data use "
+    "search_deals; for people use search_people."
     " API docs: https://www.diffbot.com/docs/dql/"
 )
 
@@ -121,9 +120,9 @@ def build_organizations_query(
 
 @mcp.tool(name="search_organizations", title="Search Organizations", description=DESCRIPTION, annotations=READ_ONLY)
 async def search_organizations(
-    name: Annotated[Optional[Union[str, List[str]]], "One name, a list of names (OR), or a homepage domain such as diffbot.com"] = None,
+    name: Annotated[Optional[Union[str, List[str]]], "Company name(s) or homepage domain"] = None,
     industry: Annotated[Optional[List[str]], "Industries (OR); free text ok"] = None,
-    primary_industry: Annotated[bool, "True (default): industry must be a primary category. False also matches secondary tags"] = True,
+    primary_industry: Annotated[bool, "False: also match secondary tags"] = True,
     descriptors: Annotated[Optional[str], "Free-text niche, e.g. 'plant-based'"] = None,
     city: Annotated[Optional[Union[str, List[str]]], "HQ city or cities"] = None,
     region: Annotated[Optional[str], "HQ state/region"] = None,
