@@ -4,9 +4,11 @@ from ..app import READ_ONLY, mcp
 from ..dql import probe
 
 DESCRIPTION = (
-    "Hit counts for several DQL queries at once, to compare variants before pulling rows (co-constrained {} vs "
-    "loose, category vs descriptors). Zero hits means a wrong value (check dql_ontology); a count equal to the bare "
-    "type:X count means a field path was ignored. similarTo cannot be probed; never probe an unfiltered type:Article."
+    "Returns hit counts for several DQL queries at once, and no rows. Use to compare variants before dql: a {} "
+    "block versus loose clauses, or category versus descriptors. Zero hits means a bad value (check "
+    "dql_ontology). A count equal to the unfiltered type:X count means a field path was ignored. Do not probe "
+    "similarTo, and never probe an unfiltered type:Article. For one query's rows, use dql. Needs a Diffbot token "
+    "only when called."
     " API docs: https://docs.diffbot.com/docs/dql-quickstart"
 )
 

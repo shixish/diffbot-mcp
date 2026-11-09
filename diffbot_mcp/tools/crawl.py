@@ -16,10 +16,12 @@ EXTRACT_BASE = "https://api.diffbot.com/v3"
 RUNNING_STATUS_CODES = (0, 7)
 
 DESCRIPTION = (
-    "Crawls a website from a seed URL and extracts every page it finds into markdown or typed JSON. Prefer when a "
-    "task needs to discover a catalog of pages from an entire site, or deep search a site for structured data "
-    "(e.g. all product inventory, all press releases, PDFs). Crawls run in the background. `start` returns a job "
-    "name, poll `status` until is_running is false, then read `results` or `urls`. `list` and `delete` manage jobs."
+    "Discovers pages from a seed URL and extracts each one as a background crawl job. Use for a catalog of pages "
+    "on a site (docs, product sheets, press releases), not one page (extract) or an indexed lookup (search_web). "
+    "`start` launches a job that keeps running and spending crawl credits until it finishes; omitting job_name "
+    "generates one. `delete` removes that job and its stored pages. `status`, `list`, `urls`, and `results` only "
+    "read. Poll status until is_running is false, then read results or urls. Defaults: 2 hops, 100 pages crawled "
+    "and processed, stay on the seed domain. Needs a Diffbot token only when called."
     " API docs: https://www.diffbot.com/docs/crawl/"
 )
 
@@ -41,7 +43,7 @@ def job_summary(job: dict) -> dict:
 
 @mcp.tool(name="crawl", title="Crawl Website", description=DESCRIPTION, annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=True, idempotentHint=False, openWorldHint=True))
 async def crawl(
-    action: Annotated[Literal["start", "status", "urls", "results", "list", "delete"], "start needs url; others need job_name"] = "start",
+    action: Annotated[Literal["start", "status", "urls", "results", "list", "delete"], "start launches a job that spends crawl credits until it finishes (needs url); delete removes the job and its stored pages (needs job_name); status, urls, results, and list only read"] = "start",
     url: Annotated[Optional[str], "Seed URL (start)"] = None,
     job_name: Annotated[Optional[str], "Job handle; generated on start if omitted"] = None,
     hops: Annotated[int, "Link depth from seed"] = 2,
@@ -50,7 +52,7 @@ async def crawl(
     restrict_domain: Annotated[bool, "Stay on the seed's domain"] = True,
     url_crawl_pattern: Annotated[Optional[str], "Only visit URLs containing this"] = None,
     url_process_pattern: Annotated[Optional[str], "Only extract URLs containing this, e.g. /blog/"] = None,
-    obey_robots: Annotated[bool, "Honor robots.txt"] = False,
+    obey_robots: Annotated[bool, "Honor robots.txt. Default false, so URLs robots.txt disallows may still be fetched"] = False,
     use_proxies: Annotated[bool, "Crawl with Diffbot proxy; try when site blocks the crawler"] = False,
     crawl_delay: Annotated[Optional[float], "Seconds between requests per domain"] = None,
     custom_headers: Annotated[Optional[str], "Extra HTTP headers, newline separated"] = None,

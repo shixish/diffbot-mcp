@@ -6,10 +6,11 @@ from ..app import READ_ONLY, mcp
 NLP_ENDPOINT = "https://nl.diffbot.com/v1/"
 
 DESCRIPTION = (
-    "Named entity recognition and linking. Finds people, organizations, places, and products mentioned in text. "
-    "Each resolves to a Diffbot Knowledge Graph entity with confidence, salience, and sentiment. Prefer for "
-    "post-processing plain text for entity mentions. The response includes dql_filter, an id:or(...) clause for "
-    "dql to fetch the full records. Entities without an id were recognized but not matched."
+    "Finds people, organizations, places, and products mentioned in plain text and links each to a Knowledge "
+    "Graph id, with confidence, salience, and sentiment. Use to ground a passage before looking entities up. "
+    "The response includes dql_filter, an id:or(...) clause for dql to fetch the full records. Entities with no "
+    "id were recognized but not matched. If you already have a name, use search_organizations, search_people, "
+    "or search_places instead. Does not return full records. Needs a Diffbot token only when called."
     " API docs: https://www.diffbot.com/docs/natural-language/"
 )
 

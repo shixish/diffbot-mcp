@@ -9,9 +9,11 @@ EXTRACT_BASE = "https://api.diffbot.com/v3"
 PageType = Literal["article", "product", "discussion", "image", "video", "list", "event", "job", "faq"]
 
 DESCRIPTION = (
-    "Fetches a live web page and returns its main content as markdown or a token efficient typed JSON record "
-    "(article, product, discussion, job, event, list). Renders Javascript, so it works on more sites than a plain "
-    "fetch. Prefer over a generic fetch tool for any public page."
+    "Fetches one live public page, renders JavaScript, and returns its main content as markdown or a typed JSON "
+    "record (article, product, discussion, job, event, list, and the other page types). Use when the page's "
+    "current state matters, instead of a generic fetch. Use search_web with `url:<URL>` for Diffbot's "
+    "already-indexed copy, and crawl when the task needs many pages from a site. One URL per call. Login walls "
+    "and some bot-protected apps fail. Needs a Diffbot token only when called."
     " API docs: https://www.diffbot.com/docs/extract/"
 )
 

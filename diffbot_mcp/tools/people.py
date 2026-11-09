@@ -7,11 +7,11 @@ from ..dql import DEFAULT_FIELDS, resolve_value, run
 from ..dql_builder import build, clause, compare, expand_titles, looks_like_domain, or_clause, parse_range, sort_clause, subquery
 
 DESCRIPTION = (
-    "People structured search over the Diffbot Knowledge Graph. Prefer for leadership teams, executive and role "
-    "lookups, alumni lists, skill-based sourcing, and profile facts on a named person. Filter by job title, "
-    "employer, employer industry or size, school, major, skills, residence, nationality, or net worth. Prefer over "
-    "a generic web search when the answer involves structured people data. Covers people with a public "
-    "professional presence only. For companies use search_organizations."
+    "Searches people with a public professional profile by name, title, employer, employer industry or size, "
+    "school, skills, residence, or nationality. Use for leadership, role, alumni, and skill lookups instead of "
+    "search_web. leadership_of, a domain or company name, returns that company's CEO and founders. Companies "
+    "are search_organizations. Needs at least one filter. Names are exact, and C-suite titles expand to both "
+    "spellings. Queries this tool cannot express go to dql. Needs a Diffbot token only when called."
     " API docs: https://www.diffbot.com/docs/dql/"
 )
 
@@ -165,7 +165,7 @@ async def search_people(
     employer_country: Annotated[Optional[str], "Employer HQ country"] = None,
     job_category: Annotated[Optional[str], "Occupation group, e.g. 'Business', 'Religion'"] = None,
     job_location: Annotated[Optional[str], "City or country where the job is"] = None,
-    current: Annotated[bool, "False: include past jobs"] = True,
+    current: Annotated[bool, "True (default): current jobs only. False includes past jobs"] = True,
     school: Annotated[Optional[str], "Institution name"] = None,
     school_location: Annotated[Optional[str], "City or country of the school"] = None,
     major: Annotated[Optional[str], "Field of study"] = None,

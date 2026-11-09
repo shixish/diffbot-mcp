@@ -7,11 +7,12 @@ from ..dql import DEFAULT_FIELDS, resolve_value, run
 from ..dql_builder import build, clause, compare, date_range, or_clause, subquery
 
 DESCRIPTION = (
-    "News and article structured search over the Diffbot Knowledge Graph. Prefer for highly relevant results on "
-    "named entities or uncommon keywords. Filter by mentioned organization/person/brand/product, topic, publisher, "
-    "language, country, date range, or sentiment. Results are chronological newest first, with no semantic "
-    "reranking. Prefer over a generic web search for any news, including breaking stories. mentions is the "
-    "strongest signal filter; if it returns nothing, retry the same words as text."
+    "Searches Knowledge Graph news articles by mentioned entity, topic, publisher, language, country, date, or "
+    "sentiment. Use for news about a named entity or an uncommon phrase, including breaking stories, instead of "
+    "search_web. Newest first, with no semantic reranking. mentions is the strongest filter; if it returns "
+    "nothing, retry the same words as text. Needs at least one narrowing filter; an unfiltered article query "
+    "times out. Ambiguous topic text returns taxonomy candidates instead of rows. Other entity types are dql. "
+    "Needs a Diffbot token only when called."
     " API docs: https://www.diffbot.com/docs/dql/"
 )
 
@@ -77,7 +78,7 @@ def build_news_query(
 @mcp.tool(name="search_news", title="Search News", description=DESCRIPTION, annotations=READ_ONLY)
 async def search_news(
     mentions: Annotated[Optional[List[str]], "Organizations, people, brand, product or entities the article must mention (OR)"] = None,
-    topic: Annotated[Optional[str], "Topic category; free text ok"] = None,
+    topic: Annotated[Optional[str], "Topic category. Free text is resolved to ArticleCategory; ambiguous text returns candidates instead of rows"] = None,
     text: Annotated[Optional[str], "Phrase in article body. Use for uncommon phrases or as a fallback to mentions"] = None,
     title: Annotated[Optional[str], "Phrase in the headline"] = None,
     publisher: Annotated[Optional[str], "Publisher site, e.g. Reuters"] = None,
