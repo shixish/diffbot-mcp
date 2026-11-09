@@ -8,36 +8,40 @@ Admin page, after the upstream PR is merged to `diffbot/diffbot-mcp` `main`:
 
 https://glama.ai/mcp/servers/diffbot/diffbot-mcp/admin/dockerfile
 
-Leave the base image and Node.js version at their defaults. Glama's image already provides `uv` and uses Node for `mcp-proxy`. Do not `apt-get install` Python, do not call `pip`, and do not put `mcp-proxy` in the command (Glama adds it).
+Leave the base image and Node.js version at their defaults. Glama's image already provides `uv` and Node. Do not `apt-get install` Python and do not call `pip`.
+
+`uv sync` installs dependencies into `/app/.venv`. The auto-detected command runs `python3`, which is the base interpreter and does not see that environment (`ModuleNotFoundError: No module named 'fastmcp'`). The command must use the venv interpreter. On the Dockerfile page the saved command includes `mcp-proxy`; keep that prefix and replace `python3`.
 
 ## Form values
 
+Paste this over the build spec. `uv sync` is the step Glama already ran successfully.
+
+```json
+{
+  "baseImage": "debian:trixie-slim",
+  "nodeVersion": "24",
+  "pythonVersion": "3.12",
+  "buildSteps": ["uv sync"],
+  "cmdArguments": ["mcp-proxy", "--", "/app/.venv/bin/python", "diffbot_mcp_server.py"],
+  "placeholderArguments": {},
+  "pinnedCommit": null
+}
+```
+
 | Field | Value |
 | --- | --- |
-| Runtime | Python |
-| Python version | 3.12 |
-| Node.js version | default |
-| Build steps | the JSON array below |
-| CMD arguments | the JSON array below |
+| Base image | `debian:trixie-slim` |
+| Python version | 3.12 (3.15 also installs; it is not what failed) |
+| Node.js version | 24 |
+| Build steps | `["uv sync"]` |
+| CMD arguments | `["mcp-proxy", "--", "/app/.venv/bin/python", "diffbot_mcp_server.py"]` |
 | Environment variables schema | the JSON object below |
 | Placeholder parameters | `{}` |
-| Pinned commit SHA | empty (latest `main` after Sync Server) |
+| Pinned commit SHA | empty after Sync Server, or the `main` SHA Glama should check out |
 
-`requires-python` is `>=3.10`. 3.12 matches the image this repo ships.
+`diffbot_mcp_server.py` speaks stdio unless `MCP_TRANSPORT` is set. Leave `MCP_TRANSPORT` unset. Do not pass `--sse` or `http`. Do not add a second `mcp-proxy`.
 
-### Build steps
-
-```json
-["uv venv /app/.venv", "uv pip install --python /app/.venv/bin/python ."]
-```
-
-### CMD arguments
-
-```json
-["/app/.venv/bin/diffbot-mcp"]
-```
-
-Glama turns that into `mcp-proxy -- /app/.venv/bin/diffbot-mcp`. The `diffbot-mcp` entry point speaks stdio unless `MCP_TRANSPORT` is set. Leave `MCP_TRANSPORT` unset. Do not pass `--sse` or `http`.
+Glama clones `github.com/diffbot/diffbot-mcp`, not this fork. A failed build checked out `a0bb213` even with `pinnedCommit` null, which is behind current upstream `main`. Sync the server before Deploy. That checkout is old enough to boot with the command above; it does not contain the description updates on this branch until those commits are on upstream `main`.
 
 ### Environment variables schema
 
@@ -75,4 +79,4 @@ Publishing the release is what makes Glama score the server. The awesome-mcp-ser
 
 ## Local check of the build steps
 
-The steps assume `uv` is on `PATH` and the repo is at `/app`, which is Glama's layout. In a clean Python 3.12 container, install `uv`, copy the repo to `/app`, then run only the two build steps and `/app/.venv/bin/diffbot-mcp` with no token.
+The steps assume `uv` is on `PATH` and the repo is at `/app`, which is Glama's layout. In a clean Python 3.12 container, install `uv`, copy the repo to `/app`, run `uv sync`, and start `/app/.venv/bin/python diffbot_mcp_server.py` with no token. `python3 diffbot_mcp_server.py` fails the same way Glama's auto-detected command failed.
