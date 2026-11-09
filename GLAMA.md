@@ -1,35 +1,23 @@
 # Glama release
 
-`glama.json` is already on `main`. Glama lists this server after a maintainer claims it and a release build answers `initialize` and `tools/list`.
-
-The auto-detected command can stay as it is:
-
-```json
-["mcp-proxy", "--", "python3", "diffbot_mcp_server.py"]
-```
-
-`uv sync` does not make that work. It installs into `/app/.venv`, and `python3` is the uv-managed base interpreter, which then fails with `No module named 'fastmcp'`. That interpreter also refuses a normal install. The build step has to opt in:
-
-```json
-["uv pip install --python \"$(uv python find)\" --break-system-packages ."]
-```
-
-Full spec:
+Keep Glama's default build step and command:
 
 ```json
 {
   "baseImage": "debian:trixie-slim",
   "nodeVersion": "24",
   "pythonVersion": "3.12",
-  "buildSteps": ["uv pip install --python \"$(uv python find)\" --break-system-packages ."],
+  "buildSteps": ["uv sync"],
   "cmdArguments": ["mcp-proxy", "--", "python3", "diffbot_mcp_server.py"],
   "placeholderArguments": {},
   "pinnedCommit": null
 }
 ```
 
-Admin page: https://glama.ai/mcp/servers/diffbot/diffbot-mcp/admin/dockerfile
+`uv sync` installs into `/app/.venv`. Glama's `python3` is the base interpreter, so that command fails with `No module named 'fastmcp'` unless the checkout contains the build hook in `build_backend.py`. The hook runs during `uv sync` and points that `python3` at the virtualenv. It does nothing outside Glama's `/app` layout.
 
-Sync the server before Deploy so the checkout is current `main`. Leave `DIFFBOT_OAUTH_ISSUER` unset. Do not put a token in the placeholders. When Deploy succeeds, Make Release.
+Glama clones `github.com/diffbot/diffbot-mcp`, so this has to be on the commit that clone checks out. Sync the server before Deploy. Leave `DIFFBOT_OAUTH_ISSUER` unset, and do not put a token in the placeholders. When Deploy succeeds, Make Release.
+
+Admin page: https://glama.ai/mcp/servers/diffbot/diffbot-mcp/admin/dockerfile
 
 Claim from https://glama.ai/mcp/servers/diffbot/diffbot-mcp/score while signed in as `jeromechoo` or `shixish`.
